@@ -12,17 +12,25 @@ class DataFetch:
     def get_equities(self):
         ticker_query = 'SELECT symbol FROM symbols WHERE type <> "FUT"'
         symbols = pd.read_sql_query(ticker_query, self.engine)
+
         for symbol in symbols['symbol']:
             start_date_query = 'SELECT MAX(Date) AS Date FROM data WHERE Symbol="{}"'.format(symbol)
-            start_date = pd.read_sql_query(start_date_query, self.engine)
-            if start_date['Date'][0] is None:
-                data = dr.DataReader(symbol, self.datasource, self.start, self.end)
-                symbol = [symbol] * len(data)
-                data['Symbol'] = symbol
-                data = data.reset_index()
-                data.to_sql('data', self.engine, if_exists='append')
+            start_date = pd.read_sql_query(start_date_query, self.engine)['Date'][0]
+
+            if start_date is None:
+                start = self.start
             else:
-                pass
+                delete_query = 'DELETE FROM data WHERE Symbol="{}" AND Date="{}"'.format(symbol, start_date)
+                self.engine.execute(delete_query)
+                start = start_date
+
+            data = dr.DataReader(symbol, self.datasource, start, self.end)
+            symbol = [symbol] * len(data)
+            data['Symbol'] = symbol
+            #data = data.reset_index()
+
+            data.to_sql('data', self.engine, if_exists='append')
+
 
 
 
