@@ -24,8 +24,8 @@ class EMACross:
 
             for i in range(len(data)):
                 if data['Short_MA'][i] > data['Long_MA'][i]: #and data['Short_MO'][i] > data['Long_MO'][i]:
-                    data['Signal'][i] = 1
+                    data.loc[i, 'Signal'] = 1
                 elif data['Short_MA'][i] < data['Long_MA'][i]: # and data['Short_MO'][i] < data['Long_MO'][i]:
-                    data['Signal'][i] = -1
+                    data.loc[i, 'Signal'] = -1
 
             data.to_sql('ema_cross', self.engine, if_exists='append', index=False)
