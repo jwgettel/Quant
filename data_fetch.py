@@ -31,11 +31,6 @@ class DataFetch:
 
             data.to_sql('data', self.engine, if_exists='append')
 
-
-
-
-
-
     def get_derivatives(self):
         ticker_query = 'SELECT symbol, expiration FROM symbols WHERE type in ("FUT","OPT")'
         symbols = pd.read_sql_query(ticker_query, self.engine)
