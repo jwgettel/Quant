@@ -17,7 +17,6 @@ class TradingSignals:
 
             if start_date is None:
                 data_query = 'SELECT * FROM technical_indicators WHERE Symbol="{}"'.format(symbol)
-                calc_length = 0
             else:
                 delete_query = 'DELETE FROM trading_signals WHERE Symbol="{}" AND Date="{}"'.format(symbol, start_date)
                 self.engine.execute(delete_query)
@@ -25,10 +24,8 @@ class TradingSignals:
                     symbol,
                     start_date)
                 count = pd.read_sql_query(count_query, self.engine)['Count'][0]
-                count += self.calculation_length
-                data_query = 'SELECT * FROM (SELECT Date, Symbol, Close FROM technical_indicators WHERE Symbol="{}" ORDER BY Date ' \
-                             'DESC LIMIT {}) SUB ORDER BY Date ASC '.format(symbol, count)
-                calc_length = self.calculation_length
+                data_query = 'SELECT * FROM (SELECT * FROM technical_indicators WHERE Symbol="{}" ' \
+                             'ORDER BY Date DESC LIMIT {}) SUB ORDER BY Date ASC '.format(symbol, count)
 
             data = pd.read_sql_query(data_query, self.engine)
             data['EMA_Cross'] = [None] * len(data)
@@ -41,5 +38,5 @@ class TradingSignals:
                     data.loc[i, 'EMA_Cross'] = -10
                 elif data['Close'][i] > data['Short_MA'][i]:
                     data.loc[i, 'EMA_Cross'] = -1
-
-            print(data)
+            data = data.drop(columns=['Close', 'Short_MA', 'Long_MA', 'Short_MO', 'Long_MO'])
+            data.to_sql('trading_signals', self.engine, if_exists='append', index=False)

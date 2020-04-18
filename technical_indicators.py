@@ -40,4 +40,3 @@ class TechnicalIndicators:
             data['Long_MO'] = data['Close'].diff(self.long_mo)
             data = data.drop(data.index[:calc_length])
             data.to_sql('technical_indicators', self.engine, if_exists='append', index=False)
-            
