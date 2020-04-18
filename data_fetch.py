@@ -2,6 +2,7 @@ import pandas_datareader.data as dr
 import pandas as pd
 from datetime import datetime, date
 
+
 class DataFetch:
     def __init__(self, engine):
         self.engine = engine
@@ -35,7 +36,7 @@ class DataFetch:
         ticker_query = 'SELECT symbol, expiration FROM symbols WHERE type in ("FUT","OPT")'
         symbols = pd.read_sql_query(ticker_query, self.engine)
         for symbol in symbols['symbol']:
-            for year in range(20, 21):
+            for year in range(19, 20):
                 for month in symbols['expiration'][0]:
                     contract = symbol+month+str(year)+'.CME'
                     data = dr.DataReader(contract, self.datasource, self.start, self.end)

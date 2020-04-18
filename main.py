@@ -1,13 +1,21 @@
 from db_connection import DBConnection
 from data_fetch import DataFetch
-from ema_cross import EMACross
+from technical_indicators import TechnicalIndicators
+from trading_signals import TradingSignals
+from trade_sim import TradeSimulation
 
 mysql_conn = DBConnection().mysql_engine()
 
 data_fetch = DataFetch(mysql_conn)
 data_fetch.get_equities()
 
-ema = EMACross(mysql_conn, 9, 21, 5, 12)
-ema.calc_ema_stats()
+tech_ind = TechnicalIndicators(mysql_conn)
+tech_ind.calc_tech_indicators()
+
+trade_sig = TradingSignals(mysql_conn)
+trade_sig.calc_signals()
+
+simulation = TradeSimulation(mysql_conn)
+simulation.run_simulation()
 
 #data_fetch.get_derivatives()
