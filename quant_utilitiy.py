@@ -1,10 +1,8 @@
 import pandas as pd
-import pandas_datareader.data as dr
-from datetime import datetime
 
 
-def get_start_date(engine, symbol):
-    start_date_query = 'SELECT MAX(Date) AS Date FROM data WHERE Symbol="{}"'.format(symbol)
+def get_start_date(engine, symbol, table):
+    start_date_query = 'SELECT MAX(Date) AS Date FROM {} WHERE Symbol="{}"'.format(table, symbol)
     return pd.read_sql_query(start_date_query, engine)['Date'][0]
 
 
@@ -14,27 +12,24 @@ def get_symbols(engine, not_symbols=""):
 
 
 def get_data(engine, start_date, symbol, fetch_type, length=0):
+    print(start_date, symbol, fetch_type, length)
     bank = 1000000
 
     if start_date is None:
         if fetch_type is 'technical_indicators':
             data_query = 'SELECT Date, Symbol, Close FROM data WHERE Symbol="{}"'.format(symbol)
-            calc_length = 0
             data = pd.read_sql_query(data_query, engine)
         elif fetch_type is 'trading_signals':
             data_query = 'SELECT * FROM technical_indicators WHERE Symbol="{}"'.format(symbol)
             data = pd.read_sql_query(data_query, engine)
-        elif fetch_type is 'trad_sim':
+        elif fetch_type is 'trade_sim':
             data_query = 'SELECT A.ID, A.Symbol, A.Date, A.Close, B.EMA_Cross FROM data AS A, trading_signals AS ' \
                          'B WHERE A.Symbol = B.Symbol AND A.Date=B.Date AND A.Symbol="{}"'.format(symbol)
-            drop_length = 0
             data = pd.read_sql_query(data_query, engine)
             data['Position'] = [0] * len(data)
             data['Shares'] = [0] * len(data)
             data['Bank'] = [0] * len(data)
             data.loc[0, 'Bank'] = bank
-        else:
-            exit(1)
     else:
         if fetch_type is 'technical_indicators':
             delete_query = 'DELETE FROM technical_indicators WHERE Symbol="{}" AND Date="{}"'.format(symbol, start_date)
@@ -45,7 +40,6 @@ def get_data(engine, start_date, symbol, fetch_type, length=0):
             count += length
             data_query = 'SELECT * FROM (SELECT Date, Symbol, Close FROM data WHERE Symbol="{}" ORDER BY Date ' \
                          'DESC LIMIT {}) SUB ORDER BY Date ASC '.format(symbol, count)
-            calc_length = length
             data = pd.read_sql_query(data_query, engine)
         elif fetch_type is 'trading_signals':
             delete_query = 'DELETE FROM trading_signals WHERE Symbol="{}" AND Date="{}"'.format(symbol, start_date)
@@ -70,9 +64,6 @@ def get_data(engine, start_date, symbol, fetch_type, length=0):
                          'AS B WHERE A.Symbol = B.Symbol AND A.Date = B.Date AND A.Symbol="{}" ORDER BY Date ' \
                          'DESC LIMIT {}) AS L LEFT JOIN trading_simulation AS R ON L.Symbol = R.Symbol AND ' \
                          'L.Date=R.Date ORDER BY L.Date ASC '.format(symbol, count)
-            drop_length = 1
             data = pd.read_sql_query(data_query, engine)
-        else:
-            exit(1)
 
     return data

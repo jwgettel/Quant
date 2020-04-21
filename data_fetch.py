@@ -16,7 +16,7 @@ class DataFetch:
         symbols = get_symbols(self.engine, not_symbols='"FUT"')
 
         for symbol in symbols:
-            start_date = get_start_date(self.engine, symbol)
+            start_date = get_start_date(self.engine, symbol, table='data')
 
             if start_date is None:
                 start = self.start

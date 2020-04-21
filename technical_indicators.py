@@ -1,4 +1,3 @@
-import pandas as pd
 from quant_utilitiy import get_start_date, get_symbols, get_data
 
 
@@ -15,7 +14,7 @@ class TechnicalIndicators:
         symbols = get_symbols(self.engine, not_symbols='"FUT"')
 
         for symbol in symbols:
-            start_date = get_start_date(self.engine, symbol)
+            start_date = get_start_date(self.engine, symbol, table='technical_indicators')
 
             data = get_data(self.engine, start_date, symbol, fetch_type='technical_indicators', length=self.calculation_length)
 

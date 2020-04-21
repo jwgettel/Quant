@@ -1,4 +1,3 @@
-import pandas as pd
 from quant_utilitiy import get_start_date, get_symbols, get_data
 
 
@@ -11,7 +10,7 @@ class TradingSignals:
         symbols = get_symbols(self.engine, not_symbols='"FUT", "INDX"')
 
         for symbol in symbols:
-            start_date = get_start_date(self.engine, symbol)
+            start_date = get_start_date(self.engine, symbol, table='trading_signals')
 
             data = get_data(self.engine, start_date, symbol, fetch_type='trading_signals')
 
