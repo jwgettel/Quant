@@ -6,7 +6,7 @@ from trade_sim import TradeSimulation
 from datetime import datetime
 
 start = datetime.now()
-print(start)
+
 mysql_conn = DBConnection().mysql_engine()
 
 data_fetch = DataFetch(mysql_conn)

@@ -33,9 +33,11 @@ class TradeSimulation:
                     .format(symbol, start_date)
                 count = pd.read_sql_query(count_query, self.engine)['Count'][0]
                 count += 1
-                data_query = 'SELECT L.Symbol, L.Date, L.Close, L.EMA_Cross, R.Position, R.Shares, R.Bank  FROM (SELECT A.ID, A.Symbol, A.Date, A.Close, B.EMA_Cross FROM data AS A, ' \
-                             'trading_signals AS B WHERE A.ID = B.ID AND A.Symbol="{}" ORDER BY Date DESC LIMIT {}) ' \
-                             'AS L LEFT JOIN trading_simulation AS R ON L.Symbol = R.Symbol AND L.Date=R.Date ORDER BY L.Date ASC '.format(symbol, count)
+                data_query = 'SELECT L.Symbol, L.Date, L.Close, L.EMA_Cross, R.Position, R.Shares, R.Bank  FROM ' \
+                             '(SELECT A.ID, A.Symbol, A.Date, A.Close, B.EMA_Cross FROM data AS A, trading_signals ' \
+                             'AS B WHERE A.Symbol = B.Symbol AND A.Date = B.Date AND A.Symbol="{}" ORDER BY Date ' \
+                             'DESC LIMIT {}) AS L LEFT JOIN trading_simulation AS R ON L.Symbol = R.Symbol AND ' \
+                             'L.Date=R.Date ORDER BY L.Date ASC '.format(symbol, count)
                 drop_length = 1
                 data = pd.read_sql_query(data_query, self.engine)
 
@@ -66,5 +68,4 @@ class TradeSimulation:
 
             data = data.drop(data.index[:drop_length])
             data = data.drop(columns=['Close', 'EMA_Cross'])
-            print(data)
-#            data.to_sql('trading_simulation', self.engine, if_exists='append', index=False)
+            data.to_sql('trading_simulation', self.engine, if_exists='append', index=False)
