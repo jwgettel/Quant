@@ -3,7 +3,10 @@ from data_fetch import DataFetch
 from technical_indicators import TechnicalIndicators
 from trading_signals import TradingSignals
 from trade_sim import TradeSimulation
+from datetime import datetime
 
+start = datetime.now()
+print(start)
 mysql_conn = DBConnection().mysql_engine()
 
 data_fetch = DataFetch(mysql_conn)
@@ -18,4 +21,5 @@ trade_sig.calc_signals()
 simulation = TradeSimulation(mysql_conn)
 simulation.run_simulation()
 
+print(datetime.now()-start)
 #data_fetch.get_derivatives()
