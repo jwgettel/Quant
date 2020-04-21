@@ -1,5 +1,5 @@
 import pandas as pd
-from quant_utilitiy import get_start_date, get_symbols
+from quant_utilitiy import get_start_date, get_symbols, get_data
 
 
 class TradeSimulation:
@@ -13,31 +13,7 @@ class TradeSimulation:
         for symbol in symbols:
             start_date = get_start_date(self.engine, symbol)
 
-            if start_date is None:
-                data_query = 'SELECT A.ID, A.Symbol, A.Date, A.Close, B.EMA_Cross FROM data AS A, trading_signals AS ' \
-                             'B WHERE A.Symbol = B.Symbol AND A.Date=B.Date AND A.Symbol="{}"'.format(symbol)
-                drop_length = 0
-                data = pd.read_sql_query(data_query, self.engine)
-                data['Position'] = [0] * len(data)
-                data['Shares'] = [0] * len(data)
-                data['Bank'] = [0] * len(data)
-                data.loc[0, 'Bank'] = self.bank
-
-            else:
-                delete_query = 'DELETE FROM trading_simulation WHERE Symbol="{}" AND Date="{}"'.format(symbol,
-                                                                                                       start_date)
-                self.engine.execute(delete_query)
-                count_query = 'SELECT COUNT(*) AS Count FROM trading_signals WHERE Symbol="{}" AND Date>="{}"'\
-                    .format(symbol, start_date)
-                count = pd.read_sql_query(count_query, self.engine)['Count'][0]
-                count += 1
-                data_query = 'SELECT L.Symbol, L.Date, L.Close, L.EMA_Cross, R.Position, R.Shares, R.Bank  FROM ' \
-                             '(SELECT A.ID, A.Symbol, A.Date, A.Close, B.EMA_Cross FROM data AS A, trading_signals ' \
-                             'AS B WHERE A.Symbol = B.Symbol AND A.Date = B.Date AND A.Symbol="{}" ORDER BY Date ' \
-                             'DESC LIMIT {}) AS L LEFT JOIN trading_simulation AS R ON L.Symbol = R.Symbol AND ' \
-                             'L.Date=R.Date ORDER BY L.Date ASC '.format(symbol, count)
-                drop_length = 1
-                data = pd.read_sql_query(data_query, self.engine)
+            data = get_data(self.engine, start_date, symbol, fetch_type='trade_sim')
 
             for i in range(1, len(data)):
                 if data['EMA_Cross'][i] == 10 and data['Position'][i-1] == 0 or \
@@ -64,6 +40,11 @@ class TradeSimulation:
                     data.loc[i, 'Shares'] = data.loc[i-1, 'Shares']
                     data.loc[i, 'Bank'] = data.loc[i-1, 'Bank']
 
+            if start_date is None:
+                drop_length = 0
+            else:
+                drop_length = 1
             data = data.drop(data.index[:drop_length])
             data = data.drop(columns=['Close', 'EMA_Cross'])
+
             data.to_sql('trading_simulation', self.engine, if_exists='append', index=False)

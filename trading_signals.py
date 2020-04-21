@@ -1,5 +1,5 @@
 import pandas as pd
-from quant_utilitiy import get_start_date, get_symbols
+from quant_utilitiy import get_start_date, get_symbols, get_data
 
 
 class TradingSignals:
@@ -13,19 +13,8 @@ class TradingSignals:
         for symbol in symbols:
             start_date = get_start_date(self.engine, symbol)
 
-            if start_date is None:
-                data_query = 'SELECT * FROM technical_indicators WHERE Symbol="{}"'.format(symbol)
-            else:
-                delete_query = 'DELETE FROM trading_signals WHERE Symbol="{}" AND Date="{}"'.format(symbol, start_date)
-                self.engine.execute(delete_query)
-                count_query = 'SELECT COUNT(*) AS Count FROM technical_indicators WHERE Symbol="{}" AND Date>="{}"'.format(
-                    symbol,
-                    start_date)
-                count = pd.read_sql_query(count_query, self.engine)['Count'][0]
-                data_query = 'SELECT * FROM (SELECT * FROM technical_indicators WHERE Symbol="{}" ' \
-                             'ORDER BY Date DESC LIMIT {}) SUB ORDER BY Date ASC '.format(symbol, count)
+            data = get_data(self.engine, start_date, symbol, fetch_type='trading_signals')
 
-            data = pd.read_sql_query(data_query, self.engine)
             data['EMA_Cross'] = [None] * len(data)
             for i in range(len(data)):
                 if data['Short_MA'][i] > data['Long_MA'][i] and data['Short_MO'][i] > data['Long_MO'][i]:
@@ -36,5 +25,6 @@ class TradingSignals:
                     data.loc[i, 'EMA_Cross'] = -10
                 elif data['Close'][i] > data['Short_MA'][i]:
                     data.loc[i, 'EMA_Cross'] = -1
+
             data = data.drop(columns=['Close', 'Short_MA', 'Long_MA', 'Short_MO', 'Long_MO'])
             data.to_sql('trading_signals', self.engine, if_exists='append', index=False)
