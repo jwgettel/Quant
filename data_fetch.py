@@ -1,6 +1,7 @@
 import pandas_datareader.data as dr
 import pandas as pd
-from datetime import datetime, date
+from datetime import datetime
+from quant_utilitiy import get_start_date, get_symbols
 
 
 class DataFetch:
@@ -11,12 +12,11 @@ class DataFetch:
         self.end = datetime.now().strftime('%Y-%m-%d')
 
     def get_equities(self):
-        ticker_query = 'SELECT symbol FROM symbols WHERE type <> "FUT"'
-        symbols = pd.read_sql_query(ticker_query, self.engine)
 
-        for symbol in symbols['symbol']:
-            start_date_query = 'SELECT MAX(Date) AS Date FROM data WHERE Symbol="{}"'.format(symbol)
-            start_date = pd.read_sql_query(start_date_query, self.engine)['Date'][0]
+        symbols = get_symbols(self.engine, not_symbols='"FUT"')
+
+        for symbol in symbols:
+            start_date = get_start_date(self.engine, symbol)
 
             if start_date is None:
                 start = self.start
@@ -28,7 +28,6 @@ class DataFetch:
             data = dr.DataReader(symbol, self.datasource, start, self.end)
             symbol = [symbol] * len(data)
             data['Symbol'] = symbol
-            #data = data.reset_index()
 
             data.to_sql('data', self.engine, if_exists='append')
 

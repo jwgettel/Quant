@@ -1,4 +1,5 @@
 import pandas as pd
+from quant_utilitiy import get_start_date, get_symbols
 
 
 class TradingSignals:
@@ -7,13 +8,10 @@ class TradingSignals:
         self.engine = engine
 
     def calc_signals(self):
-        ticker_query = 'SELECT symbol FROM symbols WHERE type NOT IN ("FUT", "INDX")'
-        symbols = pd.read_sql_query(ticker_query, self.engine)
+        symbols = get_symbols(self.engine, not_symbols='"FUT", "INDX"')
 
-        for symbol in symbols['symbol']:
-
-            start_date_query = 'SELECT MAX(Date) AS Date FROM trading_signals WHERE Symbol="{}"'.format(symbol)
-            start_date = pd.read_sql_query(start_date_query, self.engine)['Date'][0]
+        for symbol in symbols:
+            start_date = get_start_date(self.engine, symbol)
 
             if start_date is None:
                 data_query = 'SELECT * FROM technical_indicators WHERE Symbol="{}"'.format(symbol)
