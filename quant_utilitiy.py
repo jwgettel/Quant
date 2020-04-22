@@ -1,7 +1,12 @@
 import pandas as pd
+from datetime import datetime
 
 
 def create_database(engine):
+    pass
+
+
+def remove_future_dates(engine):
     pass
 
 

@@ -1,13 +1,13 @@
 import pandas_datareader.data as dr
 import pandas as pd
 from datetime import datetime
-from quant_utilitiy import get_start_date, get_symbols
+from quant_utilitiy import *
 
 
 class DataFetch:
     def __init__(self, engine):
         self.engine = engine
-        self.datasource = 'yahoo'
+        self.data_source = 'yahoo'
         self.start = '2000-01-01'
         self.end = datetime.now().strftime('%Y-%m-%d')
 
@@ -25,7 +25,7 @@ class DataFetch:
                 self.engine.execute(delete_query)
                 start = start_date
 
-            data = dr.DataReader(symbol, self.datasource, start, self.end)
+            data = dr.DataReader(symbol, self.data_source, start, self.end)
             symbol = [symbol] * len(data)
             data['Symbol'] = symbol
 
@@ -40,5 +40,3 @@ class DataFetch:
                     contract = symbol+month+str(year)+'.CME'
                     data = dr.DataReader(contract, self.datasource, self.start, self.end)
                     print(data)
-
-

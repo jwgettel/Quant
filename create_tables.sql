@@ -13,7 +13,6 @@ CREATE TABLE trading_signals (ID BIGINT NOT NULL AUTO_INCREMENT, Symbol VARCHAR(
 CREATE TABLE trading_simulation (ID BIGINT NOT NULL AUTO_INCREMENT, Symbol VARCHAR(100), Date DATETIME, Position INT, Shares INT, Bank FLOATE, PRIMARY KEY(ID));
 
 
-INSERT INTO symbols (Symbol, Type) VALUES ('SPY', 'ETF')
-INSERT INTO symbols (Symbol, Type) VALUES ('AAPL', 'EQU')
-INSERT INTO symbols (Symbol, Type) VALUES ('^VIX', 'IND')
-INSERT INTO symbols (Symbol, Type) VALUES ('GBPUSD=X', 'CUR')
+INSERT INTO symbols (Symbol, Type) VALUES ('SPY', 'ETF');
+INSERT INTO symbols (Symbol, Type) VALUES ('AAPL', 'EQU');
+INSERT INTO symbols (Symbol, Type) VALUES ('^VIX', 'IND');
