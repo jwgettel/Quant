@@ -1,6 +1,10 @@
 import pandas as pd
 
 
+def create_database(engine):
+    pass
+
+
 def get_start_date(engine, symbol, table):
     start_date_query = 'SELECT MAX(Date) AS Date FROM {} WHERE Symbol="{}"'.format(table, symbol)
     return pd.read_sql_query(start_date_query, engine)['Date'][0]
@@ -12,7 +16,6 @@ def get_symbols(engine, not_symbols=""):
 
 
 def get_data(engine, start_date, symbol, fetch_type, length=0):
-    print(start_date, symbol, fetch_type, length)
     bank = 1000000
 
     if start_date is None:

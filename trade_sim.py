@@ -7,7 +7,7 @@ class TradeSimulation:
         self.bank = 1000000
 
     def run_simulation(self):
-        symbols = get_symbols(self.engine, not_symbols='"FUT", "INDX"')
+        symbols = get_symbols(self.engine, not_symbols='"FUT", "IND"')
 
         for symbol in symbols:
             start_date = get_start_date(self.engine, symbol, table='trading_simulation')
@@ -45,5 +45,4 @@ class TradeSimulation:
                 drop_length = 1
             data = data.drop(data.index[:drop_length])
             data = data.drop(columns=['Close', 'EMA_Cross'])
-
             data.to_sql('trading_simulation', self.engine, if_exists='append', index=False)

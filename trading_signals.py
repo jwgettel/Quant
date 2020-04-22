@@ -7,7 +7,7 @@ class TradingSignals:
         self.engine = engine
 
     def calc_signals(self):
-        symbols = get_symbols(self.engine, not_symbols='"FUT", "INDX"')
+        symbols = get_symbols(self.engine, not_symbols='"FUT", "IND"')
 
         for symbol in symbols:
             start_date = get_start_date(self.engine, symbol, table='trading_signals')
@@ -25,5 +25,5 @@ class TradingSignals:
                 elif data['Close'][i] > data['Short_MA'][i]:
                     data.loc[i, 'EMA_Cross'] = -1
 
-            data = data.drop(columns=['Close', 'Short_MA', 'Long_MA', 'Short_MO', 'Long_MO'])
+            data = data.drop(columns=['ID', 'Close', 'Short_MA', 'Long_MA', 'Short_MO', 'Long_MO'])
             data.to_sql('trading_signals', self.engine, if_exists='append', index=False)
