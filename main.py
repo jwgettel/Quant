@@ -10,6 +10,8 @@ mysql_conn = DBConnection().mysql_engine()
 
 data_fetch = DataFetch(mysql_conn)
 data_fetch.get_equities()
+data_fetch.get_dividends()
+#data_fetch.get_derivatives()
 
 tech_ind = TechnicalIndicators(mysql_conn)
 tech_ind.calc_tech_indicators()
@@ -21,4 +23,4 @@ simulation = TradeSimulation(mysql_conn)
 simulation.run_simulation()
 
 print(datetime.now()-start)
-#data_fetch.get_derivatives()
+

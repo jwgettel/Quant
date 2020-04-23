@@ -16,8 +16,8 @@ def get_start_date(engine, symbol, table):
 
 
 def get_symbols(engine, not_symbols=""):
-    symbol_query = 'SELECT symbol FROM symbols WHERE type NOT IN ({})'.format(not_symbols)
-    return pd.read_sql_query(symbol_query, engine)['symbol']
+    symbol_query = 'SELECT Symbol, Type FROM symbols WHERE type NOT IN ({})'.format(not_symbols)
+    return pd.read_sql_query(symbol_query, engine)['Symbol']
 
 
 def get_data(engine, start_date, symbol, fetch_type, length=0):
