@@ -31,23 +31,25 @@ class DataFetch:
 
     def get_dividends(self):
 
-        symbols = get_symbols(self.engine, not_symbols='"FUT", "INX"')
+        symbols = get_symbols(self.engine, not_symbols='"FUT", "IND"')
 
         for symbol in symbols:
-            start_date = get_start_date(self.engine, symbol, table='dividends')
-
-            if start_date is None:
+            start = get_start_date(self.engine, symbol, table='data', dividend=True)
+            if start is None:
                 start = self.start
-            else:
-                delete_query = 'DELETE FROM dividends WHERE Symbol="{}" AND Date="{}"'.format(symbol, start_date)
-                self.engine.execute(delete_query)
-                start = start_date
 
             dividends = dr.DataReader(symbol, self.div_data_source, start, self.end)
             symbol_list = [symbol] * len(dividends)
             dividends['Symbol'] = symbol_list
             dividends = dividends.drop(columns=['action']).sort_index()
-            dividends.to_sql('dividends', self.engine, if_exists='append', index=True, index_label='Date')
+            dividends = dividends.reset_index()
+
+            for i in range(len(dividends)):
+                date = dividends['index'][i].strftime('%Y-%m-%d')
+                symbol = dividends['Symbol'][i]
+                dividend = dividends['value'][i]
+                dividend_insert_query = 'UPDATE data SET Dividend={} WHERE Date="{}" AND Symbol="{}"'.format(dividend, date, symbol)
+                self.engine.execute(dividend_insert_query)
 
     def get_derivatives(self):
         # THIS DOESN'T WORK
