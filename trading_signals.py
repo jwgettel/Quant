@@ -15,6 +15,7 @@ class TradingSignals:
             data = get_data(self.engine, start_date, symbol, fetch_type='trading_signals')
 
             data['EMA_Cross'] = [None] * len(data)
+            data['Strategy'] = ['EMA_Cross'] * len(data)
             for i in range(len(data)):
                 if data['Short_MA'][i] > data['Long_MA'][i] and data['Short_MO'][i] > data['Long_MO'][i]:
                     data.loc[i, 'EMA_Cross'] = 10

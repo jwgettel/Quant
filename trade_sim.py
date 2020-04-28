@@ -1,4 +1,5 @@
-from quant_utilitiy import get_start_date, get_symbols, get_data
+from quant_utilitiy import *
+
 
 
 class TradeSimulation:
@@ -13,10 +14,9 @@ class TradeSimulation:
             start_date = get_start_date(self.engine, symbol, table='trading_simulation')
 
             data = get_data(self.engine, start_date, symbol, fetch_type='trade_sim')
-            print(data)
             for i in range(1, len(data)):
                 dividend_payment = 0
-                if data['Dividend'][i - 1] is not None:
+                if not pd.isnull(data['Dividend'][i - 1]):
                     dividend_payment = data['Shares'][i-1] * data['Dividend'][i-1]
 
                 if data['EMA_Cross'][i] == 10 and data['Position'][i-1] == 0 or \
