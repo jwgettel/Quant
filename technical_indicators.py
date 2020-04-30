@@ -1,4 +1,4 @@
-from quant_utilitiy import get_start_date, get_symbols, get_data
+from quant_utilitiy import *
 
 
 class TechnicalIndicators:
@@ -16,7 +16,8 @@ class TechnicalIndicators:
         for symbol in symbols:
             start_date = get_start_date(self.engine, symbol, table='technical_indicators')
 
-            data = get_data(self.engine, start_date, symbol, fetch_type='technical_indicators', length=self.calculation_length)
+            data = get_data(self.engine, start_date, symbol, fetch_type='technical_indicators', length=self.
+                            calculation_length)
 
             data['Short_MA'] = data['Close'].ewm(span=self.short_ma).mean()
             data['Long_MA'] = data['Close'].ewm(span=self.long_ma).mean()

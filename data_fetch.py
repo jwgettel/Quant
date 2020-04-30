@@ -48,7 +48,8 @@ class DataFetch:
                 date = dividends['index'][i].strftime('%Y-%m-%d')
                 symbol = dividends['Symbol'][i]
                 dividend = dividends['value'][i]
-                dividend_insert_query = 'UPDATE data SET Dividend={} WHERE Date="{}" AND Symbol="{}"'.format(dividend, date, symbol)
+                dividend_insert_query = 'UPDATE data SET Dividend={} WHERE Date="{}" AND Symbol="{}"'.\
+                    format(dividend, date, symbol)
                 self.engine.execute(dividend_insert_query)
 
     def get_derivatives(self):
