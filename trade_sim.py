@@ -54,7 +54,6 @@ class TradeSimulation:
                     drop_length = 1
                 data = data.drop(data.index[:drop_length])
                 data = data.drop(columns=['Close', 'Dividend', 'Signal'])
-                print(data)
                 data.to_sql('trading_simulation', self.engine, if_exists='append', index=False)
 
     def run_buy_hold_simulation(self):
