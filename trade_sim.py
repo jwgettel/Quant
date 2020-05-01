@@ -13,6 +13,8 @@ class TradeSimulation:
         for symbol in symbols:
             for strategy in strategies:
 
+                '''Signal and Position are messed up... fix these'''
+
                 start_date = get_start_date(self.engine, symbol, table='trading_simulation', strategy=strategy)
 
                 data = get_data(self.engine, start_date, symbol, fetch_type='trade_sim', strategy=strategy)
@@ -44,9 +46,21 @@ class TradeSimulation:
                         data.loc[i, 'Bank'] = bank - (data['Shares'][i] * data['Close'][i]) + dividend_payment
 
                     else:
+                        data.loc[i, 'Position'] = data['Position'][i]
+                        new_bank = data.loc[i - 1, 'Bank'] + dividend_payment
+                        new_shares = new_bank // data['Close'][i]
+                        data.loc[i, 'Shares'] = data['Shares'][i - 1] + new_shares
+                        data.loc[i, 'Bank'] = new_bank - (new_shares * data['Close'][i])
+
+                    '''elif data['Signal'][i] == -1 and data['Position'][i - 1] == 10 or \
+                            data['Signal'][i] == 0 and data['Position'][i - 1] == 10 or \
+                            data['Signal'][i] == 1 and data['Position'][i - 1] == -10 or \
+                            data['Signal'][i] == 10 and data['Position'][i - 1] == 10 or \
+                            data['Signal'][i] == -10 and data['Position'][i - 1] == -10 or \
+                            data['Signal'][i] == 0 and data['Position'][i - 1] == -10:
                         data.loc[i, 'Position'] = data.loc[i - 1, 'Position']
                         data.loc[i, 'Shares'] = data.loc[i - 1, 'Shares']
-                        data.loc[i, 'Bank'] = data.loc[i - 1, 'Bank'] + dividend_payment
+                        data.loc[i, 'Bank'] = data.loc[i - 1, 'Bank'] + dividend_payment'''
 
                 if start_date is None:
                     drop_length = 0
